@@ -149,8 +149,35 @@ class AppGraveyardUI:
             messagebox.showerror("错误", f"无法启动卸载程序: {e}")
     
     def refresh_scan(self):
-        """重新扫描（这里需要重新实现完整的扫描逻辑）"""
-        messagebox.showinfo("提示", "重新扫描功能将在完整版本中实现")
+        """重新扫描（实现完整的扫描逻辑）"""
+        try:
+            # 重新扫描已安装的程序
+            from scanner import AppScanner
+            from scoring import AppScorer
+            
+            scanner = AppScanner()
+            apps = scanner.scan_installed_programs()
+            
+            scorer = AppScorer()
+            enhanced_apps = []
+            
+            for app in apps:
+                last_access = scanner.get_last_access_time(app)
+                app['last_access_time'] = last_access
+                score_info = scorer.calculate_score(app)
+                app.update(score_info)
+                enhanced_apps.append(app)
+            
+            # 更新数据
+            self.apps_data = enhanced_apps
+            
+            # 清空并重新填充树形视图
+            self.populate_tree()
+            
+            messagebox.showinfo("成功", f"重新扫描完成！找到 {len(enhanced_apps)} 个应用程序。")
+            
+        except Exception as e:
+            messagebox.showerror("错误", f"重新扫描失败:\n{e}")
     
     def run(self):
         """运行UI"""
