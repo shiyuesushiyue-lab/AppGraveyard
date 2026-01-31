@@ -1,10 +1,12 @@
 @echo off
-echo 正在安装依赖...
+echo Building AppGraveyard...
+
+REM 安装依赖
 pip install -r requirements.txt
 
-echo 正在打包 AppGraveyard...
-pyinstaller --onefile --windowed --name AppGraveyard appgraveyard.py
+REM 使用 PyInstaller 打包
+pyinstaller --onefile --windowed --name AppGraveyard appgraveyard_fixed.py
 
-echo 打包完成！
-echo 可执行文件位于: dist\AppGraveyard.exe
+echo Build complete!
+echo Executable is in the dist folder.
 pause

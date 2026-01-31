@@ -1,116 +1,81 @@
 # AppGraveyard 🪦
 
-Find the apps you buried but never use.
+找出你埋葬但从未使用的应用程序，释放磁盘空间！
 
-## 功能
+## 功能特点
 
-- 扫描 Windows 已安装程序
-- 估算上次使用时间  
-- 按"垃圾程度"排序
-- 一键跳转卸载
+- 🔍 **智能扫描**: 扫描 Windows 注册表中的已安装程序
+- 📊 **智能评分**: 基于文件大小和使用频率计算"坟墓分数"
+- 💾 **空间分析**: 显示每个应用占用的磁盘空间
+- ⏰ **使用追踪**: 估算每个应用的最后使用时间
+- 🎯 **状态分类**: 
+  - 🟢 **安全卸载**: 大文件且很久没用
+  - 🟡 **可考虑**: 中等大小或使用频率不确定
+  - 🔴 **可能仍需要**: 小文件或最近使用过
+- 🗑️ **一键卸载**: 双击即可启动卸载程序
 
-## 使用
+## 安装
+
+### 方法 1: 直接运行 (推荐)
+
+1. 确保已安装 Python 3.7+
+2. 安装依赖:
+   ```bash
+   pip install psutil
+   ```
+3. 运行程序:
+   ```bash
+   python appgraveyard.py
+   ```
+
+### 方法 2: 使用预编译的 EXE
+
+从 [Releases](https://github.com/yourusername/appgraveyard/releases) 下载最新的 `.exe` 文件并直接运行。
+
+## 构建 EXE
+
+如果你想要自己构建 EXE 文件:
 
 ```bash
-AppGraveyard.exe
+pip install pyinstaller psutil
+pyinstaller --onefile --windowed --name AppGraveyard appgraveyard.py
 ```
 
-## 项目定位
+## 工作原理
 
-AppGraveyard 是一个 Windows 小工具，
-它会扫描你电脑里安装的软件，
-并告诉你：哪些你很久没用、但却占着大量空间。
+AppGraveyard 通过以下方式工作:
 
-用户只需点一下，就能看到：
-- 体积最大的程序
-- 多久没打开过  
-- 是否安全卸载
-- 并可一键跳转到系统卸载
+1. **注册表扫描**: 读取 `HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall` 和 `HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall`
+2. **文件系统分析**: 检查安装目录的实际大小和文件访问时间
+3. **智能评分**: 结合文件大小和使用频率计算卸载优先级
+4. **用户友好界面**: 提供直观的 GUI 界面进行管理
 
-## 用户真实痛点
+## 故障排除
 
-- C 盘爆了，但不知道该删谁
-- 控制面板列表太长，看不懂
-- 不敢乱删，怕系统坏
+### 问题: 显示"找到 0 个程序"
 
-AppGraveyard = 可解释的"卸载建议"
+**可能原因和解决方案:**
 
-## 核心功能（MVP）
+1. **权限不足**: 以管理员身份运行程序
+2. **防病毒软件阻止**: 临时禁用防病毒软件或添加例外
+3. **Windows 版本兼容性**: 确保使用 Windows 7 或更高版本
+4. **注册表损坏**: 运行 `sfc /scannow` 修复系统文件
 
-### 扫描已安装程序
-从 Windows 注册表获取：
-- 程序名
-- 安装路径  
-- 安装大小（估算）
-- 安装日期（若有）
+### 问题: 程序运行缓慢
 
-### 最近使用时间估计
-优先级：
-1. 可执行文件 LastAccessTime
-2. 文件夹最近访问
-3. 注册表字段 InstallDate 作为 fallback
+- 第一次运行时会扫描所有安装目录，可能需要几分钟
+- 后续运行会更快，因为会缓存部分信息
 
-### 评分规则（是否"坟墓"）
-```
-score = w1 * size_gb + w2 * days_since_last_use
-```
-默认：
-- w1 = 2
-- w2 = 0.01
+## 安全说明
 
-标记为：
-- 🟢 安全卸载
-- 🟡 可考虑  
-- 🔴 可能仍需要
+- AppGraveyard **只读取**系统信息，不会修改任何文件
+- 卸载操作会调用程序自带的卸载程序，与控制面板相同
+- 建议在卸载前确认程序确实不再需要
 
-### 界面（极简）
-| 列 | 内容 |
-|---|---|
-| 程序名 | name |
-| 大小 | size (MB/GB) |
-| 上次使用 | days |
-| 状态 | 安全/警告 |
-| 操作 | 打开卸载页 |
+## 许可证
 
-## 技术实现
+MIT License - 详情见 [LICENSE](LICENSE) 文件
 
-### 语言
-Python 3.10+
+## 贡献
 
-### 依赖
-```
-psutil
-pywin32
-tkinter (内置)
-```
-
-### 打包
-```bash
-pip install pyinstaller
-pyinstaller --onefile appgraveyard.py
-```
-
-生成：
-```
-dist/AppGraveyard.exe
-```
-
-## 目录结构
-```
-appgraveyard/
-  appgraveyard.py
-  scanner.py
-  scoring.py
-  ui.py
-  requirements.txt
-  README.md
-```
-
-## 开源协议
-MIT License
-
-## 后续扩展（不在 MVP）
-- 自动生成"释放空间统计"
-- 扫描模型缓存 / pip / conda
-- 语言切换
-- 黑名单（永不标记）
+欢迎提交 Issue 和 Pull Request！
